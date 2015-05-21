@@ -11,3 +11,10 @@
 # produced vignettes
 vignettes/*.html
 vignettes/*.pdf
+
+# Cache * derived files
+intro-r-slides_cache/
+intro-r-slides_files/
+
+# backup file
+*~

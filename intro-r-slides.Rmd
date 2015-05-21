@@ -1,0 +1,703 @@
+---
+title: "A Brief Introduction to R"
+author: Gavin L. Simpson
+date: CSEE 2015 • May 20th 2015
+fontsize: 10pt
+classoption: "compress, aspectratio=169"
+output:
+  beamer_presentation:
+    theme: m
+    keep_tex: true
+    highlight: tango
+    slide_level: 2
+    template: ./slides-template.tex
+    fig_width: 6
+    fig_height: 3.5
+    fig_crop: false
+    pandoc_args: [
+      "--latex-engine=xelatex"
+    ]
+---
+
+```{r setup-options, echo = FALSE, results = "hide", message = FALSE}
+knitr::opts_chunk$set(comment=NA, fig.align = "center",
+                      out.width = "0.7\\linewidth",
+                      echo = TRUE, message = TRUE, warning = TRUE,
+                      cache = TRUE)
+knitr::knit_hooks$set(crop.plot = knitr::hook_pdfcrop)
+```
+
+```{r packages, echo = FALSE, results = "hide"}
+library("ggplot2")
+library("gapminder")
+library("gridExtra")
+```
+
+## Why R?
+
+Why use a complicated, command-line driven stats package like R?
+
+- It's free!
+- Widley used by statisticians for new statistical methods
+- If something doesn't work the way you like, you can change it
+- R is a programming language --- you can write your own functions
+- R scripts, \alert{Sweave}, & \alert{knitr} for reproducible research
+- Works everywhere (Windows, OS X, Linux, ...)
+- R was designed for expressive data analysis
+
+# R Basics
+
+## R Basics
+
+Start \alert{RStudio} --- take a look around
+
+R will be running in either your home directory or where is was installed
+
+Set the working directory to folder containing your analysis
+
+## Getting Help
+
+R comes with a lot of documentation
+
+To get help on functions or concepts within R, use the `"?"` operator
+
+For help on the `getwd()` function use: `?getwd`
+
+Function `help.search("foo")` will search through all packages installed for help pages with `foo` in them
+
+R-Help mailing list: \url{http://www.r-project.org/mail.html}
+
+## Getting Help: Task Views
+
+\url{cran.r-project.org/web/views/}
+
+\begin{figure}
+\includegraphics[height=6cm,keepaspectratio=true]{figs/cran-task-views}
+\end{figure}
+
+## Getting Help: Stack Overflow
+
+\url{stackoverflow.com/questions/tagged/r}
+
+\begin{figure}
+\includegraphics[height=6cm,keepaspectratio=true]{figs/stackoverflow-screen-grab}
+\end{figure}
+
+## Working with R
+
+Type commands at the prompt `>` --- R evaluates them when you hit `Return`
+
+If a line is *not* syntactically complete, the prompt changes to `+`
+
+Create an object by assigning something to it
+
+\scriptsize
+```{r assignment}
+radius <- 5
+pi * radius^2
+```
+\normalsize
+
+If we don't assign, R prints a *representation* of the object
+
+## Packages
+
+R comes with a basic set of functionality plus some \alert{reccomended} packages
+
+Additional functionality added via \alert{packages} from **CRAN**, **github**, **Bioconductor**, **drat** repos
+
+\scriptsize
+```{r load-packages-example, eval = FALSE}
+install.packages(c("gapminder", "ggplot2"))
+library("gapminder")
+library("ggplot2")
+```
+\normalsize
+
+## Reading data into R
+
+\scriptsize
+```{r read-gapminder}
+gap <- system.file("gapminder.tsv", package = "gapminder")
+gapminder <- read.delim(gap)
+head(gapminder)
+```
+\normalsize
+
+## This is where we are heading
+
+\scriptsize
+```{r gapminder-example, out.width = "0.6\\linewidth"}
+ggplot(subset(gapminder, continent != "Oceania"),
+       aes(x = year, y = lifeExp, group = country, color = country)) +
+  geom_line(show_guide = FALSE) + facet_wrap(~ continent) +
+  scale_color_manual(values = country_colors) +
+  theme_bw()
+```
+\normalsize
+
+## R Objects
+
+What kind of object is `gapminder`?
+
+\scriptsize
+```{r str-gapminder}
+str(gapminder)
+class(gapminder)
+```
+\normalsize
+
+## Data frames
+
+A \alert{data frame} is R's version of an Excel spreadsheet
+
+Columns are variables
+
+Rows are observations
+
+Different **types** of data in columns
+
+Each column (\alert{component}) is of the same length
+
+Is a special case of a list
+
+## Subsetting
+
+Access the columns of a data frame using `[`, `[[` or `$`
+
+`$` is simple:
+
+Access just a single variable
+
+\scriptsize
+```{r subset-dollar}
+head(gapminder$country)
+```
+\normalsize
+
+Uses the name of required variable
+
+Partial matching
+
+\scriptsize
+```{r subset-dollar-2}
+head(gapminder$cou)
+```
+\normalsize
+
+## Subsetting
+
+`[[` is a little more flexible:
+
+Access just a single variable
+
+Use the name of required variable
+
+\scriptsize
+```{r subset-double-bracket}
+head(gapminder[["continent"]])
+```
+\normalsize
+
+Or select the *n*th component
+
+\scriptsize
+```{r subset-double-bracket-2}
+head(gapminder[[2]])
+```
+\normalsize
+
+Partial matching optional --- `gapminder[["cont", exact = FALSE]]`
+
+## Subsetting
+
+`[` is a even more flexible:
+
+Access one or more variables
+
+Use the name(s) of required variable
+
+\scriptsize
+```{r subset-single-bracket}
+head(gapminder[c("country", "continent")])
+```
+\normalsize
+
+## subsetting
+
+Or select the *n*th component(s)
+
+\scriptsize
+```{r subset-single-bracket-2}
+head(gapminder[1:2])
+```
+\normalsize
+
+## subsetting
+
+Or we can index by rows and columns: `[rows, cols, other_args]`
+
+\scriptsize
+```{r subset-single-bracket-3}
+head(gapminder[1:4, c(1,3)])
+```
+\normalsize
+
+## subsetting
+
+Leaving the row or column identifier *blank* means **"give me all of the rows (columns)"**
+
+\scriptsize
+```{r subset-single-bracket-4}
+head(gapminder[1:4, ])                  # all columns, rows 1--4
+```
+\normalsize
+
+\scriptsize
+```{r subset-single-bracket-5}
+head(gapminder[, 1:3], 3)               # all rows, columns 1--3
+```
+\normalsize
+
+## subsetting
+
+Empty dimensions get **dropped** if you select a single column
+
+\scriptsize
+```{r subset-single-bracket-6}
+head(gapminder[, 2], 3)                 # just column 2
+```
+\normalsize
+
+Preserve dimensions using `drop = FALSE`
+
+\scriptsize
+```{r subset-single-bracket-7}
+head(gapminder[, 2, drop = FALSE], 3)   # all rows, columns 1--3
+```
+\normalsize
+
+## Subsetting
+
+Can use a range of \alert{index} types
+
+- Numeric values select the `n`th elements
+- Negative numeric values select all but those elements
+- Character values select elements by name (possibly with partial matching)
+- Logical values select (`TRUE`) & deselect (`FALSE`) elements
+- Logical indices are \alert{recycled} to the correct length
+
+\scriptsize
+```{r subsetting-types}
+(1:10)[c(FALSE, TRUE)]
+(1:9)[c(FALSE, TRUE)]                   # no warning
+```
+\normalsize
+
+## Vectors
+
+What are the columns of `gapminder`?
+
+\scriptsize
+```{r str-gapminder-2}
+str(gapminder)
+```
+\normalsize
+
+Each component is a vector, of which there are several types: `numeric`, `character`, `logical`, `factor`, `integer`
+
+## Vectors --- numeric & integer
+
+R normally stores numeric data as *doubles* (decimal values)
+
+There is an *integer* type too
+
+\scriptsize
+```{r numeric-vectors-1}
+class(gapminder$lifeExp)
+class(gapminder$year)
+```
+\normalsize
+
+## Vectors --- numeric & integer
+
+Create numeric vectors using `c()` or `:`
+
+\scriptsize
+```{r numeric-vectors-2}
+c(1,3,5,7,9)
+1:10
+```
+\normalsize
+
+`x:y` is shorthand for `seq(from = x, to = y, by = 1)`
+
+## Vectors --- character
+
+Character vectors contain text (strings)
+
+\scriptsize
+```{r character-vectors-1}
+c("foo","bar")
+```
+\normalsize
+
+Quote each string using single or double quotes
+
+## Vectors --- logical
+
+Logical vectors are vectors of `TRUE` or `FALSE` values
+
+\scriptsize
+```{r logical-vectors-1}
+c(TRUE, TRUE, FALSE)
+```
+\normalsize
+
+- `FALSE` is 0
+- `TRUE` is anything else, but is coerced to `1`
+
+\scriptsize
+```{r logical-vectors-2}
+as.numeric(c(TRUE, TRUE, FALSE))
+```
+\normalsize
+
+## Vectors --- factors
+
+Factors are a special kind of vector
+
+- stored internally as a vector of *codes*
+- the codes index a set of \alert{levels} or categories, which can be numeric of character
+
+\scriptsize
+```{r factors-1}
+f <- factor(c("Male","Female","Male"))
+levels(f)
+f <- factor(c(1,2,5,5,2,1))
+as.numeric(f)                           # WRONG! Gets internal codes
+as.numeric(as.character(f))             # RIGHT! correct coercion
+```
+\normalsize
+
+## Sequences & patterned vectors
+
+Sequences and patterned vectors are very useful in some circumstances
+
+\scriptsize
+```{r seqs-patterns}
+seq(from = 1, to = 10, by = 2)
+1:5
+rep(1:3, each = 2)
+rep(1:3, times = 3:1)
+```
+\normalsize
+
+# Functions
+
+## Functions
+
+Pretty much everyting in R is either a \alert{function} or the result of a call to one
+
+Called with following format: `fun_name(arg1 = value1, arg2 = value2)`
+
+\scriptsize
+```{r functions-1}
+rnorm(10)
+args(rnorm)
+rnorm(10, mean = 2, sd = 4)
+```
+
+## Functions
+
+Can use \alert{positional} matching for argument names, but don't except for the first
+
+\scriptsize
+```{r functions-2}
+rnorm(10, 2, 4)                         # What the heck does this do?
+```
+\normalsize
+
+If you name arguments can be in any order (can be partial names)
+
+\scriptsize
+```{r functions-3}
+rnorm(sd = 4, mean = 2, n = 10)
+```
+\normalsize
+
+## Functions
+
+You can write your own functions using the `function()` function
+
+\scriptsize
+```{r functions-4}
+foo <- function(x) {                    # foo() squares it's input
+    x * x                               # last statment determines return value
+}
+class(foo)
+foo(10)
+```
+\normalsize
+
+# Split-apply-combine
+
+## Split-apply-combine
+
+The \alert{split-apply-combine} model is a common type of data analysis
+
+- \alert{split} data into chunks based on one or more factors
+- \alert{apply} a function to each chunk
+- \alert{combine} the outputs of applying the function to each chunk
+
+Several R packages provide consistent and efficient implementations of the split-apply-combine model
+
+- **plyr**, **dply**, **data.table**
+
+But base R has useful functions too
+
+- `aggregate()`, `split()` + `apply()`-family + `c|rbind()`
+
+## Split-apply-combine
+
+`aggregate` applies `FUN` to a vector, split up by one or more factors:
+
+\scriptsize
+```{r split-apply-combine-1}
+aggregate(pop ~ continent, data = gapminder, FUN = median)
+```
+\normalsize
+
+## Split-apply-combine
+
+Can do this by hand too
+
+\scriptsize
+```{r split-apply-combine-2}
+with(gapminder, sapply(split(pop, f = continent), FUN = median)) 
+```
+\normalsize
+
+## Split-apply-combine --- apply family
+
+The `apply` family provides very general approaches to applying function to aspects of data
+
+- `apply` applies a function to the `MARGIN`s of a matrix, array, or data frame
+- `sapply` applies the function to components of a list or data frame & **simplifies** if possible
+- `lapply` applies the function to components of a list or data frame & returns a list
+- `tapply` applies the function to chunks of data created by splitting on a factor
+- `mapply`, `vapply()`, `rapply()` are specialist alternatives
+
+## Split-apply-combine --- apply family
+
+\scriptsize
+```{r split-apply-combine-3}
+apply(gapminder[, 4:5], 2, FUN = median)
+tapply(gapminder$pop, gapminder$continent, FUN = median)
+```
+\normalsize
+
+## Split-apply-combine --- apply family
+
+\scriptsize
+```{r split-apply-combine-4}
+with(gapminder, lapply(split(pop, f = continent), FUN = median))
+```
+
+# Modelling
+
+# Plotting
+
+## Plotting
+
+Your R installation comes with two main plotting toolboxes
+
+- base graphics
+- grid graphics
+
+Grid graphics is extremely flexible butthat comes at a cost of complexity
+
+Two high-level interfaces to grid provides extensive plotting capabailities
+
+- **lattice**, which comes with R
+- **ggplot2**, which needs to be installed from CRAN
+
+## Base graphics
+
+These are the standard types of plots available in & produced by R & add-on packages
+
+The main function is `plot()`, with `points()`, `lines()`, `text()`, `segments()`, `polygons()`, etc acting as lower-level elements
+
+The look and feel of the plots is essentially controlled via \alert{graphical parameters} --- `?par`
+
+Other high-level functions provide to access to the main plot types --- `boxplot()`, `hist()`, `stripchart()`, `barchart()`
+
+## Base graphics
+
+\scriptsize
+```{r base-plot-1, crop.plot = TRUE}
+x <- rnorm(20)
+y <- rnorm(20)
+plot(x, y, pch = 1, col = "navyblue", cex = 1.2, type = "p")
+```
+\normalsize
+
+## Base graphics
+
+\scriptsize
+```{r base-plot-2, crop.plot = TRUE, eval = FALSE}
+plot(x, y, lty = "dashed", col = "navyblue", cex = 1.2, type = "l")
+plot(x, y, pch = 2, col = "navyblue", cex = 1.2, type = "o")
+```
+\normalsize
+
+```{r base-plot-3, crop.plot = TRUE, echo = FALSE, out.width = "0.85\\linewidth"}
+layout(matrix(1:2, ncol = 2))
+plot(x, y, lty = "dashed", col = "navyblue", cex = 1.2, type = "l")
+plot(x, y, pch = 2, col = "navyblue", cex = 1.2, type = "o")
+layout(1)
+```
+
+## Base graphics
+
+\scriptsize
+```{r base-plot-4, crop.plot = TRUE, out.width = "0.55\\linewidth", fig.show = "hold"}
+op <- par(mar = c(5,4,5,4) + 0.1)       # alter margins
+plot(x, y, pch = 1, col = "navyblue", cex = 1.2, type = "p", ann = FALSE, axes = FALSE)
+axis(side = 1); axis(side = 2)          # add axis, can be customised
+axis(side = 3); axis(side = 4)
+box()                                   # draw the box round the plot
+title(main = "My plot", xlab = "x-axis", ylab = "my y-axis label")
+par(op)                                 # reset plotting parameters
+```
+\normalsize
+
+## GGplot
+
+Base graphics are serviceable but require a lot of cruft code to go beyond basic plots --- encoding size, colour, etc using data
+
+This is where **lattice** and **ggplot2** graphics come in
+
+These are high-level plotting toolboxes that provide interfaces espousing Trellis Graphics and The Grammar of Graphics ideas, both built on top of **grid**
+
+These are *not* general purpose graphics toolkits --- need to follow the ideas & theory behind the respective paradigm
+
+If you want general-purpose, you need to use base graphics or grid
+
+Can't (easily) mix base and grid graphics
+
+## ggplot
+
+\alert{ggplot2} is an implementation of Leland Wilkinson's Grammar of Graphics (hence `gg` in the name)
+
+Three key components of a **ggpplot2** plot
+
+- **data** --- the data must be in the form of a data frame
+- **aesthetics** --- how should data be represented on the plot
+    * essentially **mappings** from variables to coordinates, size, colour, shape, transparency
+- **geometries** --- how to physically draw the data & mappings
+
+ggplot graphics consist of zero or more layers
+
+Additionally, **stats** transform variables, **scales** control axis scaling & legends, **themes** control overall look & feel, **facets** split data into panels
+
+## ggplot --- a basic plot
+
+\scriptsize
+```{r ggplot-1, fig.width = 7}
+library("ggplot2")             # load the package
+plt <- ggplot(gapminder, mapping = aes(x = year, y = pop, colour = continent, group = country)) +
+         geom_line()           # add a layer with a line geometry
+plt                            # Have to print the object to draw plot
+```
+\normalsize
+
+## ggplot --- faceting
+
+\scriptsize
+```{r ggplot-2, fig.width = 9, out.width = "0.9\\linewidth"}
+plt + facet_wrap(~ continent)  # facet by continent
+```
+\normalsize
+
+## ggplot --- stats
+
+\scriptsize
+```{r ggplot-3, fig.width = 9, out.width = "0.9\\linewidth"}
+ggplot(gapminder, mapping = aes(x = continent, y = lifeExp)) +
+    geom_boxplot()                      # has a default stat "boxplot"
+```
+\normalsize
+
+## ggplot --- stats
+
+\scriptsize
+```{r ggplot-4, fig.width = 9, out.width = "0.9\\linewidth"}
+ggplot(gapminder, mapping = aes(x = lifeExp)) +
+    geom_histogram()                      # has a default stat "bin"
+```
+\normalsize
+
+## ggplot --- stats
+
+\scriptsize
+```{r ggplot-5, fig.width = 9, out.width = "0.9\\linewidth"}
+ggplot(gapminder, mapping = aes(x = lifeExp)) +
+    geom_line(stat = "density")         # change the stat
+```
+\normalsize
+
+## ggplot --- grouping & smooths
+
+\scriptsize
+```{r ggplot-6, fig.width = 7, out.width = "0.7\\linewidth"}
+(p2 <- ggplot(subset(gapminder, year == 2002 & continent != "Oceania"),
+             aes(x = gdpPercap, y = lifeExp, colour = continent, group = continent)) +
+        geom_point() + geom_smooth(method = "lm"))
+```
+\normalsize
+
+## ggplot --- Themes
+
+\scriptsize
+```{r ggplot-7, fig.width = 7, out.width = "0.7\\linewidth"}
+p2 + theme(legend.position = "top")     # move the legend, see ?theme
+```
+\normalsize
+
+## ggplot --- Present Themes
+
+\scriptsize
+```{r ggplot-8, fig.width = 7, out.width = "0.7\\linewidth"}
+p2 + theme_bw()                         # a simple theme
+```
+\normalsize
+
+## ggplot --- Exporting plots
+
+ggplot plots can be exported to disk using `ggsave()`
+
+- If the image is on screen (last plot)
+    ```{r ggsave-1, eval = FALSE}
+    ggsave(file = "filename.pdf")
+    ```
+- If the plot is saved as an object
+    ```{r ggsave-2, eval = FALSE}
+    ggsave(p2, file = "filename.pdf")
+    ```
+- Specify the size
+    ```{r ggsave-3, eval = FALSE}
+    ggsave(file = "filename.pdf", width = 6, height = 4)
+    ```
+- Change the file type by modifying the extension
+    ```{r ggsave-4, eval = FALSE}
+    ggsave(file = "filename.png")
+    ```
+
+## Re-use
+
+Unless indicated otherwise, this slide deck is licensed under a [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/).
+
+\begin{center}
+  \ccby
+\end{center}
