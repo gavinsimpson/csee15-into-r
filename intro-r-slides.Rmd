@@ -38,7 +38,7 @@ library("gridExtra")
 Why use a complicated, command-line driven stats package like R?
 
 - It's free!
-- Widley used by statisticians for new statistical methods
+- Widely used by statisticians for new statistical methods
 - If something doesn't work the way you like, you can change it
 - R is a programming language --- you can write your own functions
 - R scripts, \alert{Sweave}, & \alert{knitr} for reproducible research
@@ -102,7 +102,7 @@ If we don't assign, R prints a *representation* of the object
 
 ## Packages
 
-R comes with a basic set of functionality plus some \alert{reccomended} packages
+R comes with a basic set of functionality plus some \alert{recommended} packages
 
 Additional functionality added via \alert{packages} from **CRAN**, **github**, **Bioconductor**, **drat** repos
 
@@ -397,7 +397,7 @@ rep(1:3, times = 3:1)
 
 ## Functions
 
-Pretty much everyting in R is either a \alert{function} or the result of a call to one
+Pretty much everything in R is either a \alert{function} or the result of a call to one
 
 Called with following format: `fun_name(arg1 = value1, arg2 = value2)`
 
@@ -433,7 +433,7 @@ You can write your own functions using the `function()` function
 \scriptsize
 ```{r functions-4}
 foo <- function(x) {                    # foo() squares it's input
-    x * x                               # last statment determines return value
+    x * x                               # last statement determines return value
 }
 class(foo)
 foo(10)
@@ -515,9 +515,9 @@ Your R installation comes with two main plotting toolboxes
 - base graphics
 - grid graphics
 
-Grid graphics is extremely flexible butthat comes at a cost of complexity
+Grid graphics is extremely flexible but that comes at a cost of complexity
 
-Two high-level interfaces to grid provides extensive plotting capabailities
+Two high-level interfaces to grid provides extensive plotting capabilities
 
 - **lattice**, which comes with R
 - **ggplot2**, which needs to be installed from CRAN
@@ -590,7 +590,7 @@ Can't (easily) mix base and grid graphics
 
 \alert{ggplot2} is an implementation of Leland Wilkinson's Grammar of Graphics (hence `gg` in the name)
 
-Three key components of a **ggpplot2** plot
+Three key components of a **ggplot2** plot
 
 - **data** --- the data must be in the form of a data frame
 - **aesthetics** --- how should data be represented on the plot

@@ -118,7 +118,7 @@ rnorm(sd = 4, mean = 2, n = 10)
 
 ## ----functions-4---------------------------------------------------------
 foo <- function(x) {                    # foo() squares it's input
-    x * x                               # last statment determines return value
+    x * x                               # last statement determines return value
 }
 class(foo)
 foo(10)
