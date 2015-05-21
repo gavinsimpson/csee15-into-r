@@ -5,7 +5,7 @@ knitr::opts_chunk$set(comment=NA, fig.align = "center",
                       cache = TRUE)
 knitr::knit_hooks$set(crop.plot = knitr::hook_pdfcrop)
 
-## ----packages, echo = FALSE, results = "hide"----------------------------
+## ----packages, echo = FALSE, results = "hide", message = FALSE, warning = FALSE----
 library("ggplot2")
 library("gapminder")
 library("gridExtra")
